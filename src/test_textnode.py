@@ -20,7 +20,7 @@ class TestTextNode(unittest.TestCase):
     def test_different_text(self):
         node = TextNode("This is a text node", TextType.BOLD)
         node2 = TextNode("This is a different text node", TextType.BOLD)
-        self.assertAlmostEqual(node, node2)
+        self.assertNotEqual(node, node2)
 
 if __name__ == "__main__":
     unittest.main()
