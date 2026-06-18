@@ -57,6 +57,13 @@ class TestHtmlNode(unittest.TestCase):
         expected = '<div id="main-container"><span class="sub-text"><a href="https://www.google.com">Click me</a></span></div>'
         self.assertEqual(parent.to_html(), expected)
     
+    def test_to_html_with_multiple_properties(self):
+        child = LeafNode("a", "test_site", {"href": "website.com", "target": "_blank"})
+        parent = ParentNode("div", [child], {"class": "link-container", "id":"footer"})
+
+        expected = '<div class="link-container" id="footer"><a href="website.com" target="_blank">test_site</a></div>'
+        self.assertEqual(parent.to_html(), expected)
+
     def test_to_html_no_tag(self):
         node = ParentNode(None, [LeafNode("span", "child")])
         with self.assertRaises(ValueError):
@@ -70,6 +77,7 @@ class TestHtmlNode(unittest.TestCase):
         parent = ParentNode("p", [leaf1, leaf2, nested_parent])
         expected = "<p><b>Bold</b> plain text <span><i>italic</i></span></p>"
         self.assertEqual(parent.to_html(), expected)
+
 
 if __name__ == "__main__":
     unittest.main()
