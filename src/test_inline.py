@@ -1,5 +1,5 @@
 import unittest
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
 from textnode import TextNode, TextType
 
 class TestSplitNodes(unittest.TestCase):
@@ -255,5 +255,85 @@ class TestSplitNodes(unittest.TestCase):
         nodes = text_to_textnodes("")
         self.assertListEqual([], nodes)
 
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+    def test_markdown_to_blocks_newlines(self):
+        md = "Block one\n\n\n\nBlock two"
+        blocks = markdown_to_blocks(md)
+        
+        self.assertEqual(
+            blocks,
+            [
+                "Block one",
+                "Block two",
+            ]
+
+        )
+    
+    def test_markdown_to_blocks_whitespace(self):
+        md = "\n\nBlock one\n\nBlock two\n\n"
+        blocks = markdown_to_blocks(md)
+        
+        self.assertEqual(
+            blocks,
+            [
+                "Block one",
+                "Block two",
+            ]
+
+        )
+
+    def test_markdown_to_blocks_leading_spaces(self):
+        md = md = "  Block one  \n\n  Block two  "
+        blocks = markdown_to_blocks(md)
+        
+        self.assertEqual(
+            blocks,
+            [
+                "Block one",
+                "Block two",
+            ]
+
+        )
+
+    def test_markdown_to_blocks_no_newlines(self):
+        md = md = "Just one block"
+        blocks = markdown_to_blocks(md)
+        
+        self.assertEqual(
+            blocks,
+            [
+                "Just one block"
+            ]
+
+        )
+
+    def test_markdown_to_blocks_empty_string(self):
+        md = md = ""
+        blocks = markdown_to_blocks(md)
+        
+        self.assertEqual(
+            blocks,
+            []
+        )
+    
 if __name__ == "__main__":
     unittest.main()
