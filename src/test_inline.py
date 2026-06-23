@@ -1,5 +1,5 @@
 import unittest
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 from textnode import TextNode, TextType
 
 class TestSplitNodes(unittest.TestCase):
@@ -99,5 +99,106 @@ class TestSplitNodes(unittest.TestCase):
         )
         self.assertListEqual([("to boot dev", "https://www.boot.dev")], matches)
 
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+    
+    def test_split_links(self):
+        node = TextNode(
+             "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode(
+                    "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+                ),
+            ],
+            new_nodes,
+        )
+
+def test_split_images_no_images(self):
+    node = TextNode("Just plain text", TextType.TEXT)
+    new_nodes = split_nodes_image([node])
+    self.assertListEqual([node], new_nodes)
+
+def test_split_images_image_at_start(self):
+    node = TextNode("![cat](cat.png) some text after", TextType.TEXT)
+    new_nodes = split_nodes_image([node])
+    self.assertListEqual(
+        [
+            TextNode("cat", TextType.IMAGE, "cat.png"),
+            TextNode(" some text after", TextType.TEXT),
+        ],
+        new_nodes,
+    )
+
+def test_split_images_image_at_end(self):
+    node = TextNode("some text before ![cat](cat.png)", TextType.TEXT)
+    new_nodes = split_nodes_image([node])
+    self.assertListEqual(
+        [
+            TextNode("some text before ", TextType.TEXT),
+            TextNode("cat", TextType.IMAGE, "cat.png"),
+        ],
+        new_nodes,
+    )
+
+def test_split_images_non_text_node_unchanged(self):
+    node = TextNode("bold text", TextType.BOLD)
+    new_nodes = split_nodes_image([node])
+    self.assertListEqual([node], new_nodes)
+
+def test_split_links_no_links(self):
+    node = TextNode("Just plain text", TextType.TEXT)
+    new_nodes = split_nodes_link([node])
+    self.assertListEqual([node], new_nodes)
+
+def test_split_links_link_at_start(self):
+    node = TextNode("[boot dev](https://www.boot.dev) is great", TextType.TEXT)
+    new_nodes = split_nodes_link([node])
+    self.assertListEqual(
+        [
+            TextNode("boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" is great", TextType.TEXT),
+        ],
+        new_nodes,
+    )
+    
+def test_split_images_multiple_nodes(self):
+    nodes = [
+        TextNode("![cat](cat.png)", TextType.TEXT),
+        TextNode("bold", TextType.BOLD),
+        TextNode("text ![dog](dog.png) end", TextType.TEXT),
+    ]
+    new_nodes = split_nodes_image(nodes)
+    self.assertListEqual(
+        [
+            TextNode("cat", TextType.IMAGE, "cat.png"),
+            TextNode("bold", TextType.BOLD),
+            TextNode("text ", TextType.TEXT),
+            TextNode("dog", TextType.IMAGE, "dog.png"),
+            TextNode(" end", TextType.TEXT),
+        ],
+        new_nodes,
+    )
 if __name__ == "__main__":
     unittest.main()
