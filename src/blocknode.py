@@ -105,13 +105,18 @@ def markdown_to_html_node(markdown: str) -> str:
             children = text_to_children(text)
             node = ParentNode(f"h{level}", children)
             block_nodes.append(node)
-
-  
-
         
     return ParentNode("div", block_nodes)
         
 
-  
-        
+def extract_title(markdown: str) -> str:
+    for line in markdown.split("\n"):
+        if line.startswith("# ") and not line.startswith("##"):
+            return line[2:].strip()
+    raise Exception("H1 Header not found")
+ 
+
+    
+
+
 

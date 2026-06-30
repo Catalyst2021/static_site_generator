@@ -1,5 +1,5 @@
 import unittest
-from blocknode import BlockType, markdown_to_blocks, block_to_block_type, markdown_to_html_node
+from blocknode import BlockType, markdown_to_blocks, block_to_block_type, markdown_to_html_node, extract_title, extract_title
 
 
 class TestBlockNodes(unittest.TestCase):
@@ -291,6 +291,36 @@ the **same** even with inline stuff
             html,
             "<div><ol><li>first</li><li>second</li><li><i>third</i></li></ol></div>",
         )
-    
+
+    def test_extract_title(self):
+        md = "# Tolkien Fan Club"
+        text = extract_title(md)
+        self.assertEqual(
+            text,
+            "Tolkien Fan Club"
+        )
+
+    def test_extract_title_no_header(self):
+        md = "Tolkien Fan Club"
+        with self.assertRaises(Exception):
+            extract_title(md)
+
+    def test_extract_title(self):
+        md = "# Hello World"
+        self.assertEqual(extract_title(md), "Hello World")
+
+    def test_extract_title_strips_whitespace(self):
+        md = "#    Hello World    "
+        self.assertEqual(extract_title(md), "Hello World")
+
+    def test_extract_title_ignores_h2(self):
+        md = "## Not H1\n# Real Title"
+        self.assertEqual(extract_title(md), "Real Title")
+
+    def test_extract_title_no_h1_raises(self):
+        md = "## Only H2\nSome text"
+        with self.assertRaises(Exception):
+            extract_title(md)
+
 if __name__ == "__main__":
     unittest.main()   

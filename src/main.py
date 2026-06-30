@@ -1,9 +1,7 @@
 import os 
 import shutil
 
-
-from textnode import TextType, TextNode
-from htmlnode import HTMLNode
+from gencontent import generate_page
 
 def copy_static(src, dst):
 
@@ -22,13 +20,11 @@ def copy_static(src, dst):
 
 
 def main():
-    text = "This is some anchor text"
-    text_type = "link"
-    url = "https://www.boot.dev"
-
-    print(TextNode(text, text_type, url))
-
     copy_static("static", "public")
+    markdown_source = "content/index.md"
+    template_source = "template.html"
+    html_destination = "public/index.html"
+    generate_page(markdown_source, template_source, html_destination)
 
 
 if __name__ == "__main__":
