@@ -26,12 +26,12 @@ def generate_pages_recursive(content_dir: str, template_source: str, basepath: s
             if filename.endswith(".md"):
                 from_path = os.path.join(dirpath, filename)
                 rel_path = os.path.relpath(dirpath, content_dir)
-                dest_path = os.path.join("public", rel_path, filename.replace(".md", ".html"))
+                dest_path = os.path.join("docs", rel_path, filename.replace(".md", ".html"))
                 generate_page(from_path, template_source, dest_path, basepath)
 
 def main():
     copy_static("static", "docs")
-    #content_dir = "content"
+    content_dir = "content"
     template_source = "template.html"
 
 
@@ -40,7 +40,7 @@ def main():
     else:
         basepath = "/"
 
-    generate_pages_recursive(basepath, template_source, basepath)
+    generate_pages_recursive(content_dir, template_source, basepath)
 
 
 
